@@ -1,25 +1,11 @@
 import matplotlib.pyplot as plt
-from dataclasses import dataclass
 import pandas as pd
-from StarData import StarData
+from Util import read_data
 
-def parse_float(n):
-    try:
-        return float(n)
-    except:
-        return None
 
 data = []
-with open("../res/bsc5.dat") as catalog:
-    buffer = catalog.readlines()
-    for line in buffer:
-        try:
-            ra = parse_float(line[75:77]) + parse_float(line[77:79]) / 60 + parse_float(line[79:83]) / 3600
-            dec = parse_float(line[84:86]) + parse_float(line[86:88]) / 60 + parse_float(line[88:90]) / 3600
-            data.append(StarData(line[4:14], ra, dec, line[11:14].strip(), parse_float(line[102:107])))
-        except:
-            continue
 
+read_data("../res/bsc5.dat", data)
 df = pd.DataFrame(data)
 
 # df.to_csv("../res/star_data.csv")

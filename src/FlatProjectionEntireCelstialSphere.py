@@ -1,14 +1,7 @@
 import matplotlib.pyplot as plt
 from dataclasses import dataclass
 import pandas as pd
-
-@dataclass(order=True)
-class StarData:
-    name: str
-    right_ascension: float
-    declination: float
-    constellation: str
-    Vmag: float
+from StarData import StarData
 
 def parse_float(n):
     try:

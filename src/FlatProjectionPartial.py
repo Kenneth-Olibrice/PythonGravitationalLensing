@@ -1,29 +1,29 @@
-from Util import read_data
+import pandas as pd
+
+from Util import read_data, gnomonic_projection
 import math
 import matplotlib.pyplot as plt
+import seaborn as sns
 
-data = []
-radius = 16
-scale = 1/radius
-center = (0, 0)
-print(center[0])
-read_data("../res/bsc5.dat", data)
-debounce = False
+star_names = ["50Alp", "48Bet", "85Eta", "64Gam", "69Sig",
+              "77Eps", "79Zet"]
+stars = []
+read_data("../res/bsc5.dat", stars)
+df = pd.DataFrame(stars)
+count = 0
+data = [[], []]
 
-for star in data:
-    if star.constellation == "Peg":
-        if debounce == False:
-            debounce = True
-            center = (star.right_ascension, star.declination)
+for star in stars:
+    if star.constellation == "UMa" and star.name[:6].strip(" ") in star_names:
+        count += 1
+        # print(f"{star.coord.ra} , {star.coord.dec}  {star.name}")
+        print(f"Name: {star.name[:6].strip(" ")} , {star.coord.ra.deg} , {star.coord.dec.deg} ")
+        x, y = gnomonic_projection(star.coord.ra.deg, star.coord.dec.deg, 10, 40, 3)
+        data[0].append(x)
+        data[1].append(y)
 
-        alpha = (star.right_ascension / 24) * 2 * math.pi
-        delta = (star.declination / 24) * 2 * math.pi
-        A = math.cos(delta) * math.cos(alpha - center[1])
-        F = scale * (180 / math.pi)/(math.sin(center[0]) * math.sin(delta) + A * math.cos(center[0]))
+# for x in data[0]:
+#     print(x)
 
-        LINE = -F * math.cos(center[0]) * math.sin(delta) - A * math.sin(center[0])
-        SAMPLE = -F * math.cos(delta) * math.sin(alpha - center[1])
-        plt.plot([LINE], [SAMPLE], f'{'ro' if star.Vmag > 5 else 'bo'}')
-
+plt.plot(data[0], data[1], 'ro')
 plt.show()
-

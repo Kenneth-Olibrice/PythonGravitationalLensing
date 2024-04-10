@@ -22,8 +22,6 @@ for star in stars:
         data[0].append(x)
         data[1].append(y)
 
-# for x in data[0]:
-#     print(x)
 
 plt.plot(data[0], data[1], 'ro')
 plt.show()

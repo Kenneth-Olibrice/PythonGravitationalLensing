@@ -49,3 +49,8 @@ def gnomonic_projection(star_ra, star_dec, center_ra, center_dec, scale):
     SAMPLE = -F * cos(delta) * sin(alpha - alpha0)
 
     return SAMPLE, LINE
+
+
+def average(values):
+    return sum(values) / len(values)
+

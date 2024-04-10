@@ -44,3 +44,4 @@ for i in range(len(data[0])):
     plt.plot([data[0][i]], [data[1][i]], 'ro')
     plt.plot([data[3][i]], [data[4][i]], 'bo')
 plt.show()
+p

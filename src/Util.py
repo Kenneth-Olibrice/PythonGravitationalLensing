@@ -1,3 +1,4 @@
+import math
 from math import cos, sin, radians, pi
 from dataclasses import dataclass
 from astropy.coordinates import SkyCoord
@@ -51,6 +52,31 @@ def gnomonic_projection(star_ra, star_dec, center_ra, center_dec, scale):
     return SAMPLE, LINE
 
 
-def average(values):
-    return sum(values) / len(values)
+def average_ra_dec(stars):
+    stars_ra = []
+    stars_dec = []
+    for star in stars:
+        stars_ra.append(star.coord.ra.deg)
+        stars_dec.append(star.coord.dec.deg)
+
+    return sum(stars_ra) / len(stars_ra), sum(stars_dec) / len(stars_dec)
+
+
+# Takes a star and returns a ra and dec after applying a lensing operation
+def lens(star, center_ra, center_dec):
+    displacement = 1.75 / 3600 # Displacement of 1.75"
+
+    # Calculate the vector between the given star and the center of lensing
+    vec_ra = center_ra - star.coord.ra.deg
+    vec_dec = center_dec - star.coord.dec.deg
+    vec_magnitude = math.sqrt(math.pow(vec_ra, 2) + math.pow(vec_dec, 2))
+
+    # Normalize the vector
+    vec_ra /= vec_magnitude
+    vec_dec /= vec_magnitude
+
+    displaced_ra = star.coord.ra.deg + displacement * math.cos(vec_ra)
+    displaced_dec = star.coord.dec.deg + displacement * math.sin(vec_dec)
+
+    return displaced_ra, displaced_dec
 

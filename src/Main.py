@@ -1,46 +1,67 @@
 import pandas as pd
 import math
-from Util import read_data, gnomonic_projection, average
+from Util import read_data, gnomonic_projection, average_ra_dec, lens
 import matplotlib.pyplot as plt
 
-star_names = ["50Alp", "48Bet", "85Eta", "64Gam", "69Sig",
-              "77Eps", "79Zet"]
-stars = []
-target_stars = []
-read_data("../res/bsc5.dat", stars)
-df = pd.DataFrame(stars)
-data = [[], [], [], [], []]
+print("Parsing bsc5 data...")
+bsc5_path = "../res/bsc5.dat"
+data = []
+read_data(bsc5_path, data)
 
-displacement = (1.75 / 60) / 60
+# Relative magnitude is graded using greek letters,
+# with alpha being the brightest stars in a given constellation and so on.
+# We are only interested in the brightest stars; those that make up familiar pictures like the big dipper.
+desired_brightness = ["Alp", "Bet", "Gam", "Del", "Eps", "Zet", "Eta"]
 
-for star in stars:
-    if star.constellation == "UMa" and star.name[:6].strip(" ") in star_names:
-        target_stars.append(star)
+constellation_names = {
+    "Ari": "Aries",
+    "Aqr": "Aquarius",
+    "Cnc": "Cancer",
+    "Cap": "Capricornus",
+    "Gem": "Gemini",
+    "Leo": "Leo",
+    "Lib": "Libra",
+    "Sgr": "Sagittarius",
+    "Sco": "Scorpius",
+    "Tau": "Taurus",
+    "UMa": "Ursa Major",
+    "Vir": "Virgo"
+}
 
-avg_ra = average([star.coord.ra.deg for star in target_stars])
-avg_dec = average([star.coord.dec.deg for star in target_stars])
+print("Which constellation would you like to view? (enter a number)")
+name_index = 1
+for key in constellation_names:
+    print(f"{name_index}. {constellation_names[key]}")
+    name_index += 1
 
-for star in target_stars:
-    print(f"Name: {star.name[:6].strip(" ")} , {star.coord.ra.deg} , {star.coord.dec.deg} ")
-    r = (avg_ra - star.coord.ra.deg, avg_dec - star.coord.dec.deg)
-    length = math.sqrt(math.pow(r[0], 2) + math.pow(r[1], 2))
-    displaced_ra = star.coord.ra.deg + displacement * math.cos(r[0] / length)
-    displaced_dec = star.coord.dec.deg + displacement * math.sin(r[1] / length)
+choice = list(constellation_names.keys())[int(input()) - 1]
 
-    x1, y1 = gnomonic_projection(star.coord.ra.deg, star.coord.dec.deg, avg_ra, avg_dec, 1)
-    x, y = gnomonic_projection(displaced_ra, displaced_dec, avg_ra, avg_dec, 1)
-    data[0].append(x)
-    data[1].append(y)
-    data[3].append(x1)
-    data[4].append(y1)
+stars_to_view = []
+for star in data:
+    if choice in star.name:
+        verify_count = 0
+        for brightness in desired_brightness:
+            if brightness in star.name:
+                stars_to_view.append(star)
 
-    if star.name[:6].strip(" ") in star_names:
-        data[2].append(6)
-    else:
-        data[2].append(0)
+average_ra, average_dec = average_ra_dec(stars_to_view)
 
+raw_x_values = []
+raw_y_values = []
+lensed_x_values = []
+lensed_y_values = []
 
-for i in range(len(data[0])):
-    plt.plot([data[0][i]], [data[1][i]], 'ro')
-    plt.plot([data[3][i]], [data[4][i]], 'bo')
+for star in stars_to_view:
+    px, py = gnomonic_projection(star.coord.ra.deg, star.coord.dec.deg, average_ra, average_dec, 1)
+    raw_x_values.append(px)
+    raw_y_values.append(py)
+
+    lensed_ra, lensed_dec = lens(star, average_ra, average_dec)
+    plx, ply = gnomonic_projection(lensed_ra, lensed_dec, average_ra, average_dec, 1)
+    lensed_x_values.append(plx)
+    lensed_y_values.append(ply)
+
+plt.plot(raw_x_values, raw_y_values, 'bo')
+plt.plot(lensed_x_values, lensed_y_values, 'ro')
 plt.show()
+

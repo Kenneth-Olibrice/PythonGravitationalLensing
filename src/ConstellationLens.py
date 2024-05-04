@@ -1,5 +1,4 @@
-import pandas as pd
-import math
+
 from Util import read_data, gnomonic_projection, average_ra_dec, lens
 import matplotlib.pyplot as plt
 
@@ -46,22 +45,25 @@ for star in data:
 
 average_ra, average_dec = average_ra_dec(stars_to_view)
 
+print(stars_to_view)
 raw_x_values = []
 raw_y_values = []
 lensed_x_values = []
 lensed_y_values = []
 
 for star in stars_to_view:
-    px, py = gnomonic_projection(star.coord.ra.deg, star.coord.dec.deg, average_ra, average_dec, 1)
+    px, py = gnomonic_projection(star.coord.ra.deg, star.coord.dec.deg, average_ra, average_dec, 0.25)
     raw_x_values.append(px)
     raw_y_values.append(py)
 
     lensed_ra, lensed_dec = lens(star, average_ra, average_dec)
-    plx, ply = gnomonic_projection(lensed_ra, lensed_dec, average_ra, average_dec, 1)
+    plx, ply = gnomonic_projection(lensed_ra, lensed_dec, average_ra, average_dec, 0.25)
     lensed_x_values.append(plx)
     lensed_y_values.append(ply)
 
+plt.title(f"{constellation_names[choice]}")
 plt.plot(raw_x_values, raw_y_values, 'bo')
 plt.plot(lensed_x_values, lensed_y_values, 'ro')
+plt.savefig(f"../finished/{choice}.png")
 plt.show()
 

@@ -80,3 +80,10 @@ def lens(star, center_ra, center_dec):
 
     return displaced_ra, displaced_dec
 
+
+def evil_sin(x):
+    return x - ((x*x*x) / math.factorial(3)) + ((x*x*x*x*x) / math.factorial(5)) - ((x*x*x*x*x*x*x) / math.factorial(7))
+
+
+def evil_cos(x):
+    return 1 - ((x*x) / math.factorial(2)) + ((x*x*x*x) / math.factorial(4)) - ((x*x*x*x*x*x) / math.factorial(6))

@@ -87,4 +87,3 @@ def evil_sin(x):
 
 def evil_cos(x):
     return 1 - ((x*x) / math.factorial(2)) + ((x*x*x*x) / math.factorial(4)) - ((x*x*x*x*x*x) / math.factorial(6))
-

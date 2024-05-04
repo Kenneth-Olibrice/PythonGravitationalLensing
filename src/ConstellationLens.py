@@ -1,5 +1,4 @@
-import pandas as pd
-import math
+
 from Util import read_data, gnomonic_projection, average_ra_dec, lens
 import matplotlib.pyplot as plt
 

@@ -5,11 +5,12 @@ from scipy import ndimage
 import math
 import scipy
 
+
 # Capitalized variables are customizable constants
-RADIUS = 200
-LENS_X = 130
-LENS_Y = 20
-IMG_PATH = "../res/red_galaxy.jpg"
+RADIUS = 115
+LENS_X = 200
+LENS_Y = 30
+IMG_PATH = "../res/Lensed2.PNG"
 
 img = mim.imread(IMG_PATH)
 img_height, img_width = [img.shape[1], img.shape[0]] # img size
@@ -18,9 +19,9 @@ x_center = img_width / 2
 y_center = img_height / 2
 
 
-def radial_distortion(r, max):
-    if r < max:
-        return (max - r) * math.cos((math.pi * r) / (2 * max))
+def radial_distortion(r, maximum):
+    if r < maximum:
+        return (maximum - r) * math.cos((math.pi * r) / (2 * maximum))
     else:
         return 0
 
@@ -36,6 +37,9 @@ def lens(a):
     if mag == 0:
         return 0, 0, a[2]
 
+    if mag > RADIUS:
+        return a[0], a[1], a[2]
+
     nx = x / mag
     ny = y / mag
 
@@ -48,7 +52,5 @@ def lens(a):
 
 arr = np.asarray(img)
 out = scipy.ndimage.geometric_transform(arr, lens)
-
 plt.imshow(out)
 plt.show()
-
